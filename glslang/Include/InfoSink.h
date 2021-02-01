@@ -94,13 +94,25 @@ public:
         default:                   append("UNKNOWN ERROR: ");   break;
         }
     }
-    void location(const TSourceLoc& loc) {
-        const int maxSize = 24;
+    void location(const TSourceLoc& loc, const EShMessages messages) {
+        const int maxSize = 1024;
         char locText[maxSize];
-        snprintf(locText, maxSize, ":%d", loc.line);
-        append(loc.getStringNameOrNum(false).c_str());
+        if (messages & EShMsgMSVCFormat)
+            snprintf(locText, maxSize, "%s(%d)", loc.getStringNameOrNum(false).c_str(), loc.line);
+        else
+            snprintf(locText, maxSize, "%s:%d", loc.getStringNameOrNum(false).c_str(), loc.line);
         append(locText);
         append(": ");
+    }
+    void location_prefix(TPrefixType message, const TSourceLoc& loc, const EShMessages messages) {
+        if (messages & EShMsgMSVCFormat || messages & EShMsgClangGCCFormat) {
+            location(loc, messages);
+            prefix(message);
+        }
+        else {
+            prefix(message);
+            location(loc, messages);
+        }
     }
     void message(TPrefixType message, const char* s) {
         prefix(message);
@@ -108,8 +120,8 @@ public:
         append("\n");
     }
     void message(TPrefixType message, const char* s, const TSourceLoc& loc) {
+        location(loc, EShMsgDefault);
         prefix(message);
-        location(loc);
         append(s);
         append("\n");
     }
