@@ -95,39 +95,34 @@ public:
         default:                   append("UNKNOWN ERROR: ");   break;
         }
     }
-    void location(const TSourceLoc& loc, bool absolute = false, bool displayColumn = false) {
-        const int maxSize = 24;
+    void location(const TSourceLoc& loc, const EShMessages messages) {
+        const int maxSize = 1024;
         char locText[maxSize];
-        if (displayColumn) {
-            snprintf(locText, maxSize, ":%d:%d", loc.line, loc.column);
-        } else {
-            snprintf(locText, maxSize, ":%d", loc.line);
-        }
-
-        if(loc.getFilename() == nullptr && shaderFileName != nullptr && absolute) {
-            append(std::filesystem::absolute(shaderFileName).string());
-        } else {
-            std::string location = loc.getStringNameOrNum(false);
-            if (absolute) {
-                append(std::filesystem::absolute(location).string());
-            } else {
-                append(location);
-            }
-        }
-
+        if (messages & EShMsgMSVCFormat)
+            snprintf(locText, maxSize, "%s(%d)", loc.getStringNameOrNum(false).c_str(), loc.line);
+        else
+            snprintf(locText, maxSize, "%s:%d", loc.getStringNameOrNum(false).c_str(), loc.line);
         append(locText);
         append(": ");
+    }
+    void location_prefix(TPrefixType message, const TSourceLoc& loc, const EShMessages messages) {
+        if (messages & EShMsgMSVCFormat || messages & EShMsgClangGCCFormat) {
+            location(loc, messages);
+            prefix(message);
+        }
+        else {
+            prefix(message);
+            location(loc, messages);
+        }
     }
     void message(TPrefixType message, const char* s) {
         prefix(message);
         append(s);
         append("\n");
     }
-    void message(TPrefixType message, const char* s, const TSourceLoc& loc, bool absolute = false,
-                 bool displayColumn = false)
-    {
+    void message(TPrefixType message, const char* s, const TSourceLoc& loc) {
+        location(loc, EShMsgDefault);
         prefix(message);
-        location(loc, absolute, displayColumn);
         append(s);
         append("\n");
     }

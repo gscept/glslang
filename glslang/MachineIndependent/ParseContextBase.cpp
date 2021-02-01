@@ -58,9 +58,14 @@ void TParseContextBase::outputMessage(const TSourceLoc& loc, const char* szReaso
 
     safe_vsprintf(szExtraInfo, maxSize, szExtraInfoFormat, args);
 
-    infoSink.info.prefix(prefix);
-    infoSink.info.location(loc, messages & EShMsgAbsolutePath, messages & EShMsgDisplayErrorColumn);
-    infoSink.info << "'" << szToken <<  "' : " << szReason << " " << szExtraInfo << "\n";
+    infoSink.info.location_prefix(prefix, loc, messages);
+    if (strlen(szToken) > 0)
+        infoSink.info << "'" << szToken << "'";
+    if (strlen(szReason) > 0)
+        infoSink.info << " : " << szReason;
+    if (strlen(szExtraInfo) > 0)
+        infoSink.info << " " << szExtraInfo;
+    infoSink.info << "\n";
 
     if (prefix == EPrefixError) {
         ++numErrors;
