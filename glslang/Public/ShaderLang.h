@@ -273,6 +273,8 @@ enum EShMessages : unsigned {
     EShMsgAbsolutePath         = (1 << 16), // Output Absolute path for messages
     EShMsgDisplayErrorColumn   = (1 << 17), // Display error message column aswell as line
     EShMsgLinkTimeOptimization = (1 << 18), // perform cross-stage optimizations during linking
+    EShMsgMSVCFormat 		   = (1 << 19), // print messages in MSVC format <source>(column): <message>
+    EShMsgClangGCCFormat 	   = (1 << 20), // print messages in GCC/Clang format <source>:column: <message>
     LAST_ELEMENT_MARKER(EShMsgCount),
 };
 
