@@ -37,6 +37,7 @@
 
 #include "../Include/Common.h"
 #include <filesystem>
+#include "../Public/ShaderLang.h"
 #include <cmath>
 
 namespace glslang {
